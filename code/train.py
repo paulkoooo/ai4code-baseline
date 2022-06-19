@@ -48,6 +48,10 @@ df_orders = pd.read_csv(
 
 train_ds = MarkdownDataset(train_df_mark, model_name_or_path=args.model_name_or_path, md_max_len=args.md_max_len,
                            total_max_len=args.total_max_len, fts=train_fts)
+
+print('downsampling training size to 400k')
+train_ds = random_split(train_ds, [400000], generator=torch.Generator().manual_seed(42))
+
 val_ds = MarkdownDataset(val_df_mark, model_name_or_path=args.model_name_or_path, md_max_len=args.md_max_len,
                          total_max_len=args.total_max_len, fts=val_fts)
 train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=args.n_workers,
