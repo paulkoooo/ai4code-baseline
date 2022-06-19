@@ -3,7 +3,7 @@ from pathlib import Path
 from dataset import *
 import numpy as np
 import pandas as pd
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, random_split
 from model import *
 from tqdm import tqdm
 import sys, os
@@ -50,7 +50,7 @@ train_ds = MarkdownDataset(train_df_mark, model_name_or_path=args.model_name_or_
                            total_max_len=args.total_max_len, fts=train_fts)
 
 print('downsampling training size to 400k')
-train_ds = random_split(train_ds, [400000], generator=torch.Generator().manual_seed(42))
+train_ds, _ = random_split(train_ds, [400000, 1550114], generator=torch.Generator().manual_seed(42))
 
 val_ds = MarkdownDataset(val_df_mark, model_name_or_path=args.model_name_or_path, md_max_len=args.md_max_len,
                          total_max_len=args.total_max_len, fts=val_fts)
