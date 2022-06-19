@@ -25,10 +25,13 @@ parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--accumulation_steps', type=int, default=4)
 parser.add_argument('--epochs', type=int, default=5)
 parser.add_argument('--n_workers', type=int, default=8)
+parser.add_argument('--output_path', type=str, default='./outputs') # L28
+parser.add_argument('--input_path', type=str, default='./input') #L29
+
 
 args = parser.parse_args()
-os.mkdir("./outputs")
-data_dir = Path('..//input/')
+os.mkdir(args.output_path)
+data_dir = Path(args.input_path)
 
 train_df_mark = pd.read_csv(args.train_mark_path).drop("parent_id", axis=1).dropna().reset_index(drop=True)
 train_fts = json.load(open(args.train_features_path))
@@ -36,7 +39,7 @@ val_df_mark = pd.read_csv(args.val_mark_path).drop("parent_id", axis=1).dropna()
 val_fts = json.load(open(args.val_features_path))
 val_df = pd.read_csv(args.val_path)
 
-order_df = pd.read_csv("../input/train_orders.csv").set_index("id")
+order_df = pd.read_csv(args.input_path + "/train_orders.csv").set_index("id") #L41
 df_orders = pd.read_csv(
     data_dir / 'train_orders.csv',
     index_col='id',
@@ -130,7 +133,7 @@ def train(model, train_loader, val_loader, epochs):
         val_df.loc[val_df["cell_type"] == "markdown", "pred"] = y_pred
         y_dummy = val_df.sort_values("pred").groupby('id')['cell_id'].apply(list)
         print("Preds score", kendall_tau(df_orders.loc[y_dummy.index], y_dummy))
-        torch.save(model.state_dict(), "./outputs/model.bin")
+        torch.save(model.state_dict(), "./" + args.output_path + "/model.bin") # L134
 
     return model, y_pred
 
